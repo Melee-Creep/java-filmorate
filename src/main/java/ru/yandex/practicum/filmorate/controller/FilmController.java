@@ -17,7 +17,7 @@ import java.util.Map;
 public class FilmController {
 
     private final Map<Long, Film> films = new LinkedHashMap<>();
-    private final LocalDate MINDATERELEASEFILM = LocalDate.of(1895, 12, 28);
+    private final LocalDate MINIMUM_DATE_RELEASE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -38,7 +38,7 @@ public class FilmController {
             throw new ValidationException("Описание фильма слишком длинное");
         }
 
-        if (film.getReleaseDate().isBefore(MINDATERELEASEFILM)) {
+        if (film.getReleaseDate().isBefore(MINIMUM_DATE_RELEASE)) {
             log.error("Указана дата выпуска до 28.12.1895");
             throw new ValidationException("Дата выпуска фильма слишком ранняя");
         }
@@ -87,7 +87,7 @@ public class FilmController {
                 log.error("Название фильма больше 200 символов");
                 throw new ValidationException("Описание фильма слишком длинное");
             }
-            if (newFilm.getReleaseDate().isBefore(MINDATERELEASEFILM)) {
+            if (newFilm.getReleaseDate().isBefore(MINIMUM_DATE_RELEASE)) {
                 log.error("Указана дата выпуска до 28.12.1895");
                 throw new ValidationException("Дата выпуска фильма слишком ранняя");
             }
