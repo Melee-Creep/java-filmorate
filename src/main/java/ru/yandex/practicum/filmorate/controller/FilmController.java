@@ -28,7 +28,7 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
         log.info("Create Film: {} - Started", film);
-        if (film.getName() == null) {
+        if (film.getName().isBlank()) {
             log.error("Название фильма пустое");
             throw new ValidationException("Название фильма не может быть пустым");
         }
@@ -79,6 +79,10 @@ public class FilmController {
 
         if (films.containsKey(newFilm.getId())) {
             Film oldFilm = films.get(newFilm.getId());
+            if (newFilm.getName().isBlank()) {
+                log.error("Название фильма пустое");
+                throw new ValidationException("Название фильма не может быть пустым");
+            }
             if (newFilm.getDescription().length() > 200) {
                 log.error("Название фильма больше 200 символов");
                 throw new ValidationException("Описание фильма слишком длинное");
