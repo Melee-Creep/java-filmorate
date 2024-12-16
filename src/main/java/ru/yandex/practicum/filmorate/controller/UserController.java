@@ -27,43 +27,101 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("Create User: {} - Started", user);
-
-        if (user.getId() == null) {
-            log.info("Присвоение id пользователю");
-            user.setId(getNextId());
-        }
-
-        if (user.getEmail().isBlank()) {
-            log.error("Почта не может быть пустой");
-            throw new ValidationException("Почта не может быть пустой");
-        }
-        if (!user.getEmail().contains("@")) {
-            log.error("Почта должна содержать символ @");
-            throw new ValidationException("Почта должна содержать символ @");
-        }
-
-        if (user.getLogin().isBlank()) {
-            log.error("Логин не может быть пустым");
-            throw new ValidationException("Логин не может быть пустым");
-        }
-        if (user.getLogin().contains(" ")) {
-            log.error("Логин не должен содержать пробелы");
-            throw new ValidationException("Логин не должен содержать пробелы");
-        }
-
-        if (user.getBirthday().isAfter(LocalDateTime.now().toLocalDate())) {
-            log.error("Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-
-        if (user.getName() == null) {
-            log.info("Присвоение пустому имени. Имя в качестве логина");
-            user.setName(user.getLogin());
-        }
-
+        String method = "Post";
+        validateUser(user, method);
         log.info("Create User: {} - Finished", user);
-        users.put(user.getId(), user);
         return user;
+    }
+
+    @PutMapping
+    public User update(@RequestBody User newUser) {
+        log.info("Update User: {} - Started", newUser);
+        String method = "Put";
+        validateUser(newUser, method);
+        log.info("Update User: {} - Finished", newUser);
+        return newUser;
+    }
+
+    private void validateUser(User user, String method) {
+
+        switch (method) {
+            case "Post" :
+                if (user.getId() == null) {
+                    log.info("Присвоение id пользователю");
+                    user.setId(getNextId());
+                }
+                if (user.getEmail().isBlank()) {
+                    log.error("Почта не может быть пустой");
+                    throw new ValidationException("Почта не может быть пустой");
+                }
+                if (!user.getEmail().contains("@")) {
+                    log.error("Почта должна содержать символ @");
+                    throw new ValidationException("Почта должна содержать символ @");
+                }
+
+                if (user.getLogin().isBlank()) {
+                    log.error("Логин не может быть пустым");
+                    throw new ValidationException("Логин не может быть пустым");
+                }
+                if (user.getLogin().contains(" ")) {
+                    log.error("Логин не должен содержать пробелы");
+                    throw new ValidationException("Логин не должен содержать пробелы");
+                }
+
+                if (user.getBirthday().isAfter(LocalDateTime.now().toLocalDate())) {
+                    log.error("Дата рождения не может быть в будущем");
+                    throw new ValidationException("Дата рождения не может быть в будущем");
+                }
+
+                if (user.getName() == null) {
+                    log.info("Присвоение пустому имени. Имя в качестве логина");
+                    user.setName(user.getLogin());
+                }
+                users.put(user.getId(), user);
+                break;
+
+            case "Put":
+                if (user.getId() == null) {
+                    log.error("Не указан id для обновления");
+                    throw new NotFoundException("Не указан id для обновления");
+                }
+
+                if (users.containsKey(user.getId())) {
+                    User oldUser = users.get(user.getId());
+                    if (user.getEmail().isBlank()) {
+                        log.error("Почта не может быть пустой");
+                        throw new ValidationException("Почта не может быть пустой");
+                    }
+                    if (!user.getEmail().contains("@")) {
+                        log.error("Почта должна содержать символ @");
+                        throw new ValidationException("Почта должна содержать символ @");
+                    }
+                    if (user.getLogin().isBlank()) {
+                        log.error("Логин не может быть пустым");
+                        throw new ValidationException("Логин не может быть пустым");
+                    }
+                    if (user.getLogin().contains(" ")) {
+                        log.error("Логин не должен содержать пробелы");
+                        throw new ValidationException("Логин не должен содержать пробелы");
+                    }
+                    if (user.getBirthday().isAfter(LocalDateTime.now().toLocalDate())) {
+                        log.error("Дата рождения не может быть в будущем");
+                        throw new ValidationException("Дата рождения не может быть в будущем");
+                    }
+                    if (user.getName() == null) {
+                        log.info("Присвоение пустому имени. Имя в качестве логина");
+                        user.setName(user.getLogin());
+                    }
+                    oldUser.setId(user.getId());
+                    oldUser.setName(user.getName());
+                    oldUser.setEmail(user.getEmail());
+                    oldUser.setBirthday(user.getBirthday());
+                    oldUser.setLogin(user.getLogin());
+                    break;
+                }
+                log.error("Пользователь с таким id не найден");
+                throw new NotFoundException("Пользователь с id = " + user.getId() + " не найден");
+        }
     }
 
     // вспомогательный метод для генерации идентификатора нового пользователя
@@ -75,51 +133,4 @@ public class UserController {
                 .orElse(0);
         return ++currentMaxId;
     }
-
-    @PutMapping
-    public User update(@RequestBody User newUser) {
-        log.info("Update User: {} - Started", newUser);
-        if (newUser.getId() == null) {
-            log.error("Не указан id для обновления");
-            throw new NotFoundException("Не указан id для обновления");
-        }
-
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            if (newUser.getEmail().isBlank()) {
-                log.error("Почта не может быть пустой");
-                throw new ValidationException("Почта не может быть пустой");
-            }
-            if (!newUser.getEmail().contains("@")) {
-                log.error("Почта должна содержать символ @");
-                throw new ValidationException("Почта должна содержать символ @");
-            }
-            if (newUser.getLogin().isBlank()) {
-                log.error("Логин не может быть пустым");
-                throw new ValidationException("Логин не может быть пустым");
-            }
-            if (newUser.getLogin().contains(" ")) {
-                log.error("Логин не должен содержать пробелы");
-                throw new ValidationException("Логин не должен содержать пробелы");
-            }
-            if (newUser.getBirthday().isAfter(LocalDateTime.now().toLocalDate())) {
-                log.error("Дата рождения не может быть в будущем");
-                throw new ValidationException("Дата рождения не может быть в будущем");
-            }
-            if (newUser.getName() == null) {
-                log.info("Присвоение пустому имени. Имя в качестве логина");
-                newUser.setName(newUser.getLogin());
-            }
-            log.info("Update User: {} - Finished", newUser);
-            oldUser.setId(newUser.getId());
-            oldUser.setName(newUser.getName());
-            oldUser.setEmail(newUser.getEmail());
-            oldUser.setBirthday(newUser.getBirthday());
-            oldUser.setLogin(newUser.getLogin());
-            return oldUser;
-        }
-        log.error("Пользователь с таким id не найден");
-        throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
-    }
-
 }
