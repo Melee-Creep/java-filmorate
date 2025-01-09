@@ -30,6 +30,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Collection<User> findUserFriends(long userId) {
+        findUserById(userId);
         log.info("начало поиска друзей у id - {}", userId);
         if (userFriends.get(userId) == null || userFriends.get(userId).isEmpty()) {
             log.error("userFriends.get(userId) = " + userFriends.get(userId));
