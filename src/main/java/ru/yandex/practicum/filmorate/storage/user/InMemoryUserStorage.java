@@ -51,11 +51,11 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Попытка поиска друзей у себя же");
             throw new ValidationException("Нельзя искать общих друзей у себя же");
         }
-        if (userFriends.get(userId) == null || userFriends.get(userId).isEmpty() ) {
+        if (userFriends.get(userId) == null || userFriends.get(userId).isEmpty()) {
             log.error("у позльзователя - {} нет друзей", userId);
             throw new NotFoundException("Друзья у пользователя не найдены");
         }
-        if (userFriends.get(friendId) == null || userFriends.get(friendId).isEmpty() ) {
+        if (userFriends.get(friendId) == null || userFriends.get(friendId).isEmpty()) {
             log.error("у позльзователя - {} нет друзей", friendId);
             throw new NotFoundException("Друзья у запрашиваемого пользователя не найдены");
         }
@@ -114,9 +114,9 @@ public class InMemoryUserStorage implements UserStorage {
             log.info("конец добавления в друзья: пользователь - {}, друг - {}", user, friend);
             return friend;
         }
-        Set<User> FriendFriends = new HashSet<>(userFriends.get(friend.getId()));
-        FriendFriends.add(user);
-        userFriends.put(friend.getId(), FriendFriends);
+        Set<User> friendFriends = new HashSet<>(userFriends.get(friend.getId()));
+        friendFriends.add(user);
+        userFriends.put(friend.getId(), friendFriends);
         log.info("конец добавления в друзья: пользователь - {}, друг - {}", user, friend);
         return friend;
     }
@@ -131,7 +131,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ValidationException("Нельзя удалить себя же из друзей");
         }
         // удаляем друга у юзера
-        if (userFriends.get(user.getId()) == null ) {
+        if (userFriends.get(user.getId()) == null) {
             Set<User> userFriend = new HashSet<>();
             return;
         }
