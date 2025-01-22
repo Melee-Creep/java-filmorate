@@ -45,15 +45,15 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(long id, long userId) {
-      User user = userStorage.findUserById(userId).
-              orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+      User user = userStorage.findUserById(userId)
+              .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
       filmStorage.addLike(id, user);
     }
 
     @Override
     public void deleteLike(long id, long userId) {
-        User user = userStorage.findUserById(userId).
-                orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+        User user = userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
         filmStorage.deleteLike(id, user);
     }
 }
