@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -44,13 +45,15 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(long id, long userId) {
-      User user = userStorage.findUserById(userId);
+      User user = userStorage.findUserById(userId).
+              orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
       filmStorage.addLike(id, user);
     }
 
     @Override
     public void deleteLike(long id, long userId) {
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.findUserById(userId).
+                orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
         filmStorage.deleteLike(id, user);
     }
 }

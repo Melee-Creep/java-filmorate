@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,7 +14,6 @@ import java.util.stream.Collectors;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new LinkedHashMap<>();
-    private static final LocalDate MIN_DATE_RELEASE_FILM = LocalDate.of(1895, 12, 28);
     private final Map<Film, Set<User>> likeFilms = new HashMap<>();
 
 
@@ -43,17 +40,31 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        String method = "Post";
-        validateFilm(film, method);
+        if (film.getId() == null) {
+            log.info("Начало присвоения id фильму: {} id = {}", film.getName(), film.getId());
+            film.setId(getNextId());
+            log.info("Конец присвоения id фильму: {} id = {}", film.getName(), film.getId());
+        }
+        films.put(film.getId(), film);
         likeFilms.put(film, Set.of());
         return film;
     }
 
     @Override
     public Film update(Film newFilm) {
-        String method = "Put";
-        validateFilm(newFilm, method);
-        return newFilm;
+        if (newFilm.getId() == null) {
+            log.error("Не указан id для обновления");
+            throw new NotFoundException("Не указан id для обновления");
+        }
+        if (films.containsKey(newFilm.getId())) {
+            Film oldFilm = films.get(newFilm.getId());
+            oldFilm.setDescription(newFilm.getDescription());
+            oldFilm.setName(newFilm.getName());
+            oldFilm.setDuration(newFilm.getDuration());
+            oldFilm.setReleaseDate(newFilm.getReleaseDate());
+            return newFilm;
+        }
+        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 
     @Override
@@ -83,73 +94,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         updateUserLikes.remove(user);
         likeFilms.put(film, updateUserLikes);
         log.info("удалили лайк = " +  likeFilms.get(film).toString());
-    }
-
-    private void validateFilm(Film film, String method) {
-
-        switch (method) {
-            case "Post":
-                if (film.getName() == null || film.getName().isBlank()) {
-                    log.error("Название фильма пустое");
-                    throw new ValidationException("Название фильма не может быть пустым");
-                }
-
-                if (film.getDescription().length() > 200) {
-                    log.error("Название фильма больше 200 символов");
-                    throw new ValidationException("Описание фильма слишком длинное");
-                }
-
-                if (film.getReleaseDate().isBefore(MIN_DATE_RELEASE_FILM)) {
-                    log.error("Указана дата выпуска до 28.12.1895");
-                    throw new ValidationException("Дата выпуска фильма слишком ранняя");
-                }
-
-                if (film.getDuration() < 1) {
-                    log.error("Продолжительность фильма меньше минуты");
-                    throw new ValidationException("Продолжительность фильма меньше минуты");
-                }
-
-                if (film.getId() == null) {
-                    log.info("Начало присвоения id фильму: {} id = {}", film.getName(), film.getId());
-                    film.setId(getNextId());
-                    log.info("Конец присвоения id фильму: {} id = {}", film.getName(), film.getId());
-                }
-                films.put(film.getId(), film);
-                break;
-
-            case "Put":
-                if (film.getId() == null) {
-                    log.error("Не указан id для обновления");
-                    throw new NotFoundException("Не указан id для обновления");
-                }
-
-                if (films.containsKey(film.getId())) {
-                    Film oldFilm = films.get(film.getId());
-                    if (film.getName().isBlank()) {
-                        log.error("Название фильма пустое");
-                        throw new ValidationException("Название фильма не может быть пустым");
-                    }
-                    if (film.getDescription().length() > 200) {
-                        log.error("Название фильма больше 200 символов");
-                        throw new ValidationException("Описание фильма слишком длинное");
-                    }
-                    if (film.getReleaseDate().isBefore(MIN_DATE_RELEASE_FILM)) {
-                        log.error("Указана дата выпуска до 28.12.1895");
-                        throw new ValidationException("Дата выпуска фильма слишком ранняя");
-                    }
-                    if (film.getDuration() < 1) {
-                        log.error("Продолжительность фильма меньше минуты");
-                        throw new ValidationException("Продолжительность фильма меньше минуты");
-                    }
-                    oldFilm.setDescription(film.getDescription());
-                    oldFilm.setName(film.getName());
-                    oldFilm.setDuration(film.getDuration());
-                    oldFilm.setReleaseDate(film.getReleaseDate());
-                    break;
-                }
-                log.error("Фильм с таким id не найден");
-                throw new NotFoundException("Фильм с id = " + film.getId() + " не найден");
-        }
     }
 
     // вспомогательный метод для генерации идентификатора нового фильма
