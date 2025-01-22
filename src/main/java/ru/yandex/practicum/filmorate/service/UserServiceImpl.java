@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserById(long id) {
-        return userStorage.findUserById(id).
-                orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+        return userStorage.findUserById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
     }
 
     @Override
