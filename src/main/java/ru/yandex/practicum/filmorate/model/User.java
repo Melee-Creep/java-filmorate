@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class User {
 
@@ -18,4 +17,5 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private List<Friendship> friendships;
 }
