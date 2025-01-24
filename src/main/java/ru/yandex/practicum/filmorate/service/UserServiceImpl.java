@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<User> findUserFriends(long userId) {
         findUserById(userId);
-        if (userStorage.findUserFriends(userId).isEmpty()){
+        if (userStorage.findUserFriends(userId).isEmpty()) {
           return   Set.of();
         }
         return userStorage.findUserFriends(userId);
