@@ -13,6 +13,4 @@ public interface GenreStorage {
 
     Optional<Genre> getGenreById(int id);
 
-
-
 }

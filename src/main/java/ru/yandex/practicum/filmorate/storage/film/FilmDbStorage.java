@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.GenreMapper;
 
 import java.sql.*;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -28,13 +27,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         String sql = "SELECT * FROM films";
         return jdbcTemplate.query(sql, new FilmMapper());
     }
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public List<Film> findPopular(int count) {
         String sql = "SELECT f.*, COUNT(l.user_id) AS like_count " +
                 "FROM films f " +
                 "LEFT JOIN likes l ON f.film_id = l.film_id " +

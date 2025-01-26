@@ -13,8 +13,8 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,12 +27,12 @@ public class FilmServiceImpl implements FilmService {
     private final MpaStorage mpaStorage;
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return filmStorage.findAll();
     }
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public List<Film> findPopular(int count) {
         return filmStorage.findPopular(count);
     }
 
@@ -55,7 +55,7 @@ public class FilmServiceImpl implements FilmService {
             }
         }
         // Фильтрация дублирующихся жанров
-        List<Genre> uniqueGenres = film.getGenres().stream()
+        List<Genre> uniqueGenres = Objects.requireNonNull(film.getGenres(), "Cписок жанров пустой").stream()
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -72,14 +72,14 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void addLike(long id, long userId) {
       User user = userStorage.findUserById(userId)
-              .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+              .orElseThrow(() -> new NotFoundException("Пользователя с Id - " + userId + " нету"));
       filmStorage.addLike(id, user);
     }
 
     @Override
     public void deleteLike(long id, long userId) {
         User user = userStorage.findUserById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+                .orElseThrow(() -> new NotFoundException("Пользователя с Id - " + userId + " нету"));
         filmStorage.deleteLike(id, user);
     }
 }
