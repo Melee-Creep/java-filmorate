@@ -44,15 +44,13 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film create(Film film) {
         if (film.getMpa() != null && mpaStorage.getMpaById(film.getMpa().getId()).isEmpty()) {
-            throw new ValidationException("Рейтинга с id = " + film.getMpa().getId() + " не найден");
-            //Ошибка 400, тесты в гитхабе прошли с 404! баг гитхаба?
+            throw new NotFoundException("Рейтинга с id = " + film.getMpa().getId() + " не найден");
         }
         // Проверка на существование жанров
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
                 if (genreStorage.getGenreById(genre.getId()).isEmpty()) {
-                    throw new ValidationException("Жанр с id = " + genre.getId() + " не найден");
-                    //Ошибка 400, тесты в гитхабе прошли с 404! баг гитхаба?
+                    throw new NotFoundException("Жанр с id = " + genre.getId() + " не найден");
                 }
             }
         }
