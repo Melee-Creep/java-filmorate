@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -24,11 +25,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(long id) {
         return userStorage.findUserById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователя с таким айди нету"));
+                .orElseThrow(() -> new NotFoundException("Пользователя с Id - " + id + " нету"));
     }
 
     @Override
     public Collection<User> findUserFriends(long userId) {
+        findUserById(userId);
+        if (userStorage.findUserFriends(userId).isEmpty()) {
+          return   Set.of();
+        }
         return userStorage.findUserFriends(userId);
     }
 
@@ -61,6 +66,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User newUser) {
+        if (newUser.getId() == null) {
+            log.error("Не указан id для обновления");
+            throw new NotFoundException("Не указан id для обновления");
+        }
+        findUserById(newUser.getId());
         return userStorage.update(newUser);
     }
 
@@ -73,6 +83,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteFriend(long userId, long friendId) {
+        findUserById(userId);
+        findUserById(friendId);
         userStorage.deleteFriend(userId, friendId);
     }
 }

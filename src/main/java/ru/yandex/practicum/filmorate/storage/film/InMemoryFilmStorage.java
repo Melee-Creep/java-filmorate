@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,7 +9,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new LinkedHashMap<>();
@@ -18,12 +16,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public Collection<Film> findAll() {
-        return films.values();
+    public List<Film> findAll() {
+        return (List<Film>) films.values();
     }
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public List<Film> findPopular(int count) {
 
     return likeFilms.entrySet().stream()
             .sorted((film1, film2) -> Integer.compare(film2.getValue().size(), film1.getValue().size()))

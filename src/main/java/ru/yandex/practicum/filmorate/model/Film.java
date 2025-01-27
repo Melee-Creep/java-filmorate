@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Film.
@@ -14,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @ToString
+@RequiredArgsConstructor
 public class Film {
 
     private Long id;
@@ -21,4 +21,6 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
+    private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
 }

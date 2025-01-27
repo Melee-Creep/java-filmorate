@@ -27,6 +27,12 @@ public class FilmController {
         return filmService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable long id) {
+        log.info("Get. /films/{" + id + "}");
+        return filmService.findById(id);
+    }
+
     @GetMapping("/popular")
     public Collection<Film> findPopular(@RequestParam(name = "count",
             required = false, defaultValue = "10") Integer count) {

@@ -49,7 +49,6 @@ public class UserController {
         validateUser(newUser);
         log.info("Update User: {} - Finished", newUser);
         return userService.update(newUser);
-
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
